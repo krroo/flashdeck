@@ -1,0 +1,8 @@
+# 문제 덱은 절대 커밋하지 않습니다 (앱은 빈 껍데기로만 배포)
+decks/
+*.deck.json
+deck_*.json
+*backup*.json
+*.csv
+.DS_Store
+.claude/
