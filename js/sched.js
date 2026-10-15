@@ -4,8 +4,11 @@ export const DAY = 86400000;
 // 평가별 다음 복습까지 간격 (일). 못 외움=0 → 매 세션 등장
 export const INTERVAL_DAYS = { 1: 0, 2: 3, 3: 14 };
 
-// 같은 세션 안에서 다시 나오는 위치 (몇 장 뒤). 애매함은 세션당 1회만 재등장
-export const REQUEUE_GAP = { 1: 4, 2: 10 };
+// 같은 세션 안에서 틀린 카드가 다시 나오는 규칙.
+// min: 최소 몇 장 뒤부터, max: 한 세션에서 최대 몇 번까지 재등장.
+// 위치는 [min장 뒤 ~ 세션 맨 끝] 중 무작위라서 중간이나 마무리에 섞여 나오고,
+// max를 넘으면 더 이상 되돌아오지 않아 뒤쪽 카드까지 진행할 수 있음.
+export const REQUEUE = { 1: { min: 5, max: 2 }, 2: { min: 8, max: 1 } };
 
 export const nextDue = (rating, now) => now + INTERVAL_DAYS[rating] * DAY;
 

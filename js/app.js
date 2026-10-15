@@ -1,7 +1,7 @@
 import { h, icon } from './dom.js';
 import * as db from './db.js';
 import { importFile, deckIdFor } from './importer.js';
-import { INTERVAL_DAYS, REQUEUE_GAP, nextDue, isDue, buildQueue, shuffle } from './sched.js';
+import { INTERVAL_DAYS, REQUEUE, nextDue, isDue, buildQueue, shuffle } from './sched.js';
 import { renderer, answerNodes, trLabel } from './types.js';
 
 const S = {
@@ -225,7 +225,7 @@ function startStudy(cards, label, opts = {}) {
   }
   S.session = {
     queue: [...ids], base: [...ids], pos: 0, label,
-    stats: { 1: 0, 2: 0, 3: 0 }, requeued: new Set(), cur: null, from: S.view,
+    stats: { 1: 0, 2: 0, 3: 0 }, requeued: new Map(), cur: null, from: S.view,
   };
   go('study');
 }
@@ -385,11 +385,16 @@ function drawRate(el, cur) {
 
 function requeue(r) {
   const s = S.session;
+  const rule = REQUEUE[r];
+  if (!rule) return;
   const id = s.queue[s.pos];
-  if (r === 1 || (r === 2 && !s.requeued.has(id))) {
-    if (r === 2) s.requeued.add(id);
-    s.queue.splice(Math.min(s.queue.length, s.pos + 1 + REQUEUE_GAP[r]), 0, id);
-  }
+  const key = id + '|' + r;
+  const n = s.requeued.get(key) || 0;
+  if (n >= rule.max) return;
+  s.requeued.set(key, n + 1);
+  const lo = Math.min(s.queue.length, s.pos + 1 + rule.min);
+  const at = lo + Math.floor(Math.random() * (s.queue.length - lo + 1));
+  s.queue.splice(at, 0, id);
 }
 
 function rate(r) {
