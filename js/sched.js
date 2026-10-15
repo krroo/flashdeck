@@ -8,7 +8,7 @@ export const INTERVAL_DAYS = { 1: 0, 2: 3, 3: 14 };
 // min: 최소 몇 장 뒤부터, max: 한 세션에서 최대 몇 번까지 재등장.
 // 위치는 [min장 뒤 ~ 세션 맨 끝] 중 무작위라서 중간이나 마무리에 섞여 나오고,
 // max를 넘으면 더 이상 되돌아오지 않아 뒤쪽 카드까지 진행할 수 있음.
-export const REQUEUE = { 1: { min: 5, max: 2 }, 2: { min: 8, max: 1 } };
+export const REQUEUE = { 1: { min: 10, max: 10 }, 2: { min: 20, max: 5 } };
 
 export const nextDue = (rating, now) => now + INTERVAL_DAYS[rating] * DAY;
 
