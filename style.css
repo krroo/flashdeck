@@ -150,6 +150,12 @@ button { cursor: pointer; }
   flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border);
   border-radius: 1.2rem; padding: 1rem 1.1rem; cursor: pointer; user-select: text;
 }
+.flashcard { touch-action: pan-y; }
+@keyframes enter-next { from { transform: translateX(2.5rem); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes enter-prev { from { transform: translateX(-2.5rem); opacity: 0; } to { transform: none; opacity: 1; } }
+.flashcard.enter-next { animation: enter-next .18s ease-out; }
+.flashcard.enter-prev { animation: enter-prev .18s ease-out; }
+@media (prefers-reduced-motion: reduce) { .flashcard.enter-next, .flashcard.enter-prev { animation: none; } }
 .cardmeta { display: flex; justify-content: space-between; align-items: center; gap: .6rem; font-size: .8rem; color: var(--muted); margin-bottom: .7rem; }
 .cardbody { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 .q-text { font-size: 1.3rem; line-height: 1.45; font-weight: 600; }

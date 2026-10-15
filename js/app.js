@@ -339,12 +339,18 @@ function studyView() {
   cur.draw();
 
   const p = prog(id);
+  const anim = s.anim;
+  s.anim = null;
   const flash = h('div', {
-    class: 'flashcard',
-    onclick: () => { if (rd.tapToReveal && !cur.done) cur.ctrl.reveal(); },
+    class: 'flashcard' + (anim ? ' enter-' + anim : ''),
+    onclick: () => {
+      if (Date.now() - (s.swipedAt || 0) < 400) return;
+      if (rd.tapToReveal && !cur.done) cur.ctrl.reveal();
+    },
   },
   h('div', { class: 'cardmeta' }, h('span', {}, `${card.group} · ${card.topic}`), ratingBadge(p)),
   body);
+  attachSwipe(flash, s);
 
   return h('div', { class: 'study' },
     h('div', { class: 'studybar' },
@@ -395,6 +401,7 @@ function rate(r) {
   s.stats[r]++;
   requeue(r);
   s.pos++;
+  s.anim = 'next';
   render();
 }
 
@@ -404,17 +411,38 @@ function advance(r) {
   s.cur.busy = true;
   requeue(r);
   s.pos++;
+  s.anim = 'next';
   render();
 }
 
 function prevCard() {
   const s = S.session;
-  if (s && s.pos > 0) { s.pos--; render(); }
+  if (s && s.pos > 0) { s.pos--; s.anim = 'prev'; render(); }
 }
 
 function skipCard() {
   const s = S.session;
-  if (s && s.pos < s.queue.length) { s.pos++; render(); }
+  if (s && s.pos < s.queue.length) { s.pos++; s.anim = 'next'; render(); }
+}
+
+// 터치로 가로 스와이프: 왼쪽으로 밀면 다음(평가 없이 건너뜀), 오른쪽으로 밀면 이전.
+// 세로 스크롤(긴 답)은 touch-action: pan-y 로 그대로 두고, 버튼/보기 위에서 시작한 제스처는 무시.
+function attachSwipe(el, s) {
+  let start = null;
+  el.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' || e.target.closest('button,a,input,select,.opt')) { start = null; return; }
+    start = { x: e.clientX, y: e.clientY, id: e.pointerId };
+  });
+  el.addEventListener('pointercancel', () => { start = null; });
+  el.addEventListener('pointerup', (e) => {
+    if (!start || e.pointerId !== start.id) return;
+    const dx = e.clientX - start.x;
+    const dy = e.clientY - start.y;
+    start = null;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    s.swipedAt = Date.now();
+    if (dx < 0) skipCard(); else prevCard();
+  });
 }
 
 function leaveStudy() {

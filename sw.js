@@ -1,5 +1,5 @@
 // 앱 셸 오프라인 캐시 (덱 데이터는 IndexedDB에 있고 여기엔 없음)
-const CACHE = 'flashdeck-v1';
+const CACHE = 'flashdeck-v2';
 const ASSETS = [
   './', './index.html', './style.css', './manifest.webmanifest',
   './js/app.js', './js/dom.js', './js/db.js', './js/sched.js', './js/importer.js', './js/types.js',
